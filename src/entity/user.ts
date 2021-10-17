@@ -12,7 +12,7 @@ export class User extends BaseEntity {
 
     @Column("text") lastName: string;
 
-    @Column() image: string;
+    @Column({nullable: true}) image: string;
 
-    @Column("binary") pdf: string; ;
+    @Column("binary",{nullable: true}) pdf: string; ;
 }
