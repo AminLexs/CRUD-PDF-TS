@@ -1,7 +1,8 @@
 import { getRepository, getConnection } from 'typeorm';
 import { User } from '../entity/user';
 import {v4 as uuidv4} from 'uuid';
-import fs from 'fs'
+import PDFDocument  from 'pdfkit'
+
 class UserService {
     async register(email: string, firstName: string, lastName: string ) {
         // TODO: check if email already exists
@@ -63,6 +64,41 @@ class UserService {
         const userRepo = connection.getRepository(User);
         let userToRemove = await userRepo.findOne(id);
         return  await userRepo.remove(userToRemove);
+    }
+    async createUserPDF(email:string){
+        const connection = await getConnection();
+        const userRepo = connection.getRepository(User);
+        let user = await userRepo.findOne({email});
+        let pdf = new PDFDocument;
+        let buffers = [];
+        pdf.on('data',
+            buffers.push.bind(buffers));
+        pdf.on('end', () => {
+            let pdfData = Buffer.concat(buffers);
+            user.pdf = pdfData;
+        });
+        pdf.text(`First name: ${user.firstName}`, {
+            width: 300,
+            align: 'justify'
+        })
+        pdf.text(`Last name: ${user.lastName}`, {
+            width: 300,
+            align: 'justify'
+        })
+        if (user.image!==null){
+            pdf.image(`./uploads/${user.image}`, 400, 50, {fit: [100, 100], align: 'center', valign: 'center'})
+                .rect(400, 50, 100, 100).stroke()
+        }
+        pdf.flushPages();
+        pdf.end();
+        //
+        return await userRepo.save(user);
+    }
+    async getUserPDF(id:number){
+        const connection = await getConnection();
+        const userRepo = connection.getRepository(User);
+        let user = await userRepo.findOne(id);
+        return JSON.stringify({pdf:user.pdf})
     }
 
 }

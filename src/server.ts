@@ -62,7 +62,14 @@ app.post('/user/image', (req, res) => {
         .then((result)=>{ res.send(result);})
         .catch((error)=>{ res.status(500).send(error);})
 });
-app.post('/user/:id/pdf', (req, res) => {
-    response.send('Hello world.');
+app.post('/user/pdf', (req, res) => {
+    userService.createUserPDF(req.body.email)
+        .then((result)=>{ res.send(result);})
+        .catch((error)=>{ res.status(500).send(error);})
 });
-app.listen(port, () => console.log(`Running on port ${port}`));
+app.get('/user/pdf', (req, res) => {
+    userService.getUserPDF(req.query.id)
+        .then((result)=>{ res.send(result);})
+        .catch((error)=>{ res.status(500).send(error);})
+});
+app.listen(port, () => console.log(`Running on port ${port}.`));

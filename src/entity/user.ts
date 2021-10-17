@@ -14,5 +14,5 @@ export class User extends BaseEntity {
 
     @Column({nullable: true}) image: string;
 
-    @Column("binary",{nullable: true}) pdf: string; ;
+    @Column("mediumblob",{nullable: true}) pdf: Buffer ;
 }
