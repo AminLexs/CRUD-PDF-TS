@@ -5,7 +5,8 @@ import { createConnection } from "typeorm";
 import { User } from "./entity/user";
 import  userService  from "./service/user";
 import path from 'path';
-console.log(path.join(__dirname, '/entity/user.js'))
+import bodyParser from 'body-parser';
+import fileUpload from 'express-fileupload'
 createConnection({
     type: "mysql",
     host: "localhost",
@@ -24,9 +25,15 @@ createConnection({
 
 dotenv.config();
 const app = express();
+app.use(fileUpload());
+/*app.use(bodyParser.urlencoded({
+    extended: false
+}));
+app.use(bodyParser.json());*/
+
 const port = process.env.PORT
 app.get('/', (request, response) => {
-    response.send('Hello world.');
+    response.send('Hello world,..');
 });
 
 app.post('/user', (req, res) => {
@@ -49,8 +56,11 @@ app.delete('/user', (req, res) => {
         .then((result)=>{ res.send(result);})
         .catch((error)=>{ res.status(500).send(error);})
 });
-app.post('/user/:id/image', (req, res) => {
-    response.send('Hello world.');
+app.post('/user/image', (req, res) => {
+    //console.log(req.files);
+    userService.uploadImageUser(req.query.id,req.files?.image)
+        .then((result)=>{ res.send(result);})
+        .catch((error)=>{ res.status(500).send(error);})
 });
 app.post('/user/:id/pdf', (req, res) => {
     response.send('Hello world.');
